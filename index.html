@@ -3,6 +3,7 @@
 Date        Mod By      Log
 20230320    WeiJun      Enhancement for Chat History
 20230531    WeiJun      Addon textarea focus after page load
+20230531    WeiJun      Addon function detect_and_generate_clickable_link() use to check valid link and update it to clickable link
 
 
 -->
@@ -388,6 +389,7 @@ Date        Mod By      Log
 								chatWindow.appendChild(element);
 								chatWindow.scrollTop = chatWindow.scrollHeight; // scroll down to the bottom
 								lastReply = element;
+                                detect_and_generate_clickable_link();
 							}
 						});
 					}
@@ -405,6 +407,17 @@ Date        Mod By      Log
 
 	  
 	  }
+        function detect_and_generate_clickable_link() { // check valid link and update it to clickable link
+            console.log("start");
+            var repliedMessages = document.getElementsByClassName("replied-message");
+            for (var i = repliedMessages.length - 1; i < repliedMessages.length; i++) { // only update last row; save cost
+            var message = repliedMessages[i].innerHTML;
+            var regex = /(http(s)?:\/\/)?([\da-z-]+\.)+([a-z]{2,6})(\/[\w\.-\?&]*)*\/?/ig;
+            var replacedMessage = message.replace(regex, "<a href='$&' target='_blank'>$&</a>");
+            repliedMessages[i].innerHTML = replacedMessage;
+            }
+        }
+        
 		const chatWindow = document.getElementById("chat_window");
 		const messageInput = document.getElementById("message-input");
 		const sendButton = document.getElementById("send-button");
