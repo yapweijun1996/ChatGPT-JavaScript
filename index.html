@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<!-- 
+Date        Mod By      Log
+20230320    WeiJun      Enhancement for Chat History
+20230531    WeiJun      Addon textarea focus after page load
+
+
+-->
+<html>
+  <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat GPT</title>
+    <style>
+	code.language-code{
+		width: 90%;
+		display: block;
+		padding-top: 40px;
+		padding-bottom: 30px;
+	}
+	code.replied-message.language-code {
+		background-color: #1f1f1f;
+		color: #ccc;
+		font-size: 14px;
+		font-family: 'Courier New', Courier, monospace;
+		overflow: auto;
+		margin-left: 10px;
+		position: relative; /* used for positioning the copy button */
+		border-radius: 15px;
+	}
+
+	code.replied-message.language-code button {
+	  position: absolute;
+	  right: 10px;
+	  top: 10px;
+	  background-color: #ff7f50;
+	  color: #fff;
+	  padding: 5px 10px;
+	  border: none;
+	  border-radius: 3px;
+	  font-size: 14px;
+	  cursor: pointer;
+	}
+
+	code.replied-message.language-code button:hover {
+	  background-color: #ffa07a;
+	}
+
+
+	.loading {
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  height: 20px;
+	  background-color: #fff;
+	}
+
+	#dot1, #dot2, #dot3 {
+	  width: 10px;
+	  height: 10px;
+	  border-radius: 50%;
+	  background-color: #000;
+	  margin: 0 10px;
+	  animation: pulse 0.8s ease-in-out infinite;
+	}
+
+	#dot2 {
+	  animation-delay: 0.1s;
+	}
+
+	#dot3 {
+	  animation-delay: 0.2s;
+	}
+
+	@keyframes pulse {
+	  0% {
+		transform: scale(1);
+		opacity: 1;
+	  }
+	  50% {
+		transform: scale(1.5);
+		opacity: 0.5;
+	  }
+	  100% {
+		transform: scale(1);
+		opacity: 1;
+	  }
+	}
+
+	/* Set the width and height of the scrollbar */
+	.chat_window::-webkit-scrollbar {
+	  width: 5px;
+	  height: 5px;
+	}.chat_window::-moz-scrollbar {
+	  width: 5px;
+	  height: 5px;
+	}
+	
+
+	/* Define the track and thumb styles */
+	.chat_window::-webkit-scrollbar-track {
+	  background: #f1f1f1;
+	}.chat_window::-moz-scrollbar-track {
+	  background: #f1f1f1;
+	}
+
+	.chat_window::-webkit-scrollbar-thumb {
+	  background: #888;
+	}
+	.chat_window::-moz-scrollbar-thumb {
+	  background: #888;
+	}
+
+	/* Style the scrollbar on hover */
+	.chat_window::-webkit-scrollbar-thumb:hover {
+	  background: #555;
+	}.chat_window::-moz-scrollbar-thumb:hover {
+	  background: #555;
+	}
+	
+	/* Style for the chat window */
+	#chat_window {
+		width: 100%;
+		height: 300px;
+		border: 1px solid black;
+		overflow-y: scroll;
+		height: 80vh;
+	}
+	/* Style for chat messages */
+	.message {
+		margin-bottom: 10px;
+		white-space: break-spaces;
+		padding: 10px;
+		background-color: #eee;
+		margin-top: 0px;
+	}
+	/* Style for replied messages */
+	.replied-message {
+		white-space: break-spaces;
+		padding: 10px;
+	}
+
+	/* style for input text */
+	.textarea_input{
+		width: 100%;
+		resize: none;
+		height: 68px;
+		box-sizing: border-box;
+	}
+	
+	/* style for send button */
+	.send_button{
+		width: 90%;
+		height: 68px; 
+		vertical-align: top;
+		box-sizing: border-box;
+	}
+	
+	
+    </style>
+  </head>
+  <body>
+  
+    <div id="chat_window" class="chat_window"></div>
+	<div style="height:10px;"></div>
+	<table style="table-layout:fixed;width:100%;height: 10vh;" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td style="width:85%;height: 100%;">
+				<textarea id="message-input" class="textarea_input" value="" rows="1" placeholder="Type your message here"></textarea>
+			</td>
+			<td style="width:15%;height: 100%;text-align: right;">
+				<button id="send-button" class="send_button" onclick="send_message();">Send</button>
+			</td>
+		</tr>
+	</table>
+    
+    <script>
+        
+	var currentMessage = "";
+	let previousMessage = "";
+	let chatHistory = [];
+	var password = "";
+	var KEY = "";
+	var apiKey = getCookie("api_key");
+	
+	const container = document.getElementById("container"); //Get the parent element
+
+	const loading = document.createElement("div"); //Create a new div element
+	loading.classList.add("loading"); //Add the "loading" class to it
+
+	//Append the child div elements to the parent div
+	loading.appendChild(document.createElement("div")).id = "dot1";
+	loading.appendChild(document.createElement("div")).id = "dot2";
+	loading.appendChild(document.createElement("div")).id = "dot3";
+
+	// Create a TextEncoder instance
+	const encoder = new TextEncoder();
+
+	// Create a TextDecoder instance
+	const decoder = new TextDecoder();
+	
+	// Encrypt function
+	function encrypt(message) {
+		let ciphertext = '';
+		const encodedMessage = encoder.encode(message);
+		for (let i = 0; i < encodedMessage.length; i++) {
+			let charCode = encodedMessage[i];
+			let keyChar = KEY.charCodeAt(i % KEY.length);
+			let encryptedChar = charCode ^ keyChar;
+			let numValue = encryptedChar.toString().padStart(3, '0');
+			ciphertext += numValue;
+		}
+
+		return ciphertext;
+	}
+
+	// Decrypt function
+	function decrypt(ciphertext) {
+		let decodedMessage = '';
+		for (let i = 0; i < ciphertext.length; i += 3) {
+			let numStr = ciphertext.slice(i, i + 3);
+			let encryptedChar = parseInt(numStr);
+			let keyChar = KEY.charCodeAt((i / 3) % KEY.length);
+			let decryptedChar = encryptedChar ^ keyChar;
+			decodedMessage += String.fromCharCode(decryptedChar);
+		}
+		return decoder.decode(new Uint8Array(encoder.encode(decodedMessage)));
+	}
+			
+	function getCookie(name) {
+		const cookies = document.cookie.split(';');
+		for (let i = 0; i < cookies.length; i++) {
+			const cookie = cookies[i].trim();
+			if (cookie.startsWith(`${name}=`)) {
+				const value = cookie.substring(name.length + 1);
+				return decodeURIComponent(value);
+			}
+		}
+		return '';
+	}
+
+	  function chatgpt(content){
+			// default 
+			currentMessage = content;
+			// Set up the API endpoint URL
+			var apiUrl = "";
+			var model = "";
+			var selected_model = "turbo"; // davinci, turbo
+
+			if(selected_model == "davinci"){
+				apiUrl = 'https://api.openai.com/v1/completions';
+				model = 'text-davinci-003';
+			}else if(selected_model == "turbo"){
+				apiUrl = 'https://api.openai.com/v1/chat/completions';
+				model = 'gpt-3.5-turbo';
+			}
+
+			// Set up the request data
+			const prompt = 'how old are you';
+			const maxTokens = 4096;
+			const temperature = 0.9;
+
+			var requestData = {};
+				
+			if(selected_model == "davinci"){
+				requestData = {
+					"model": model,
+					"prompt": prompt,
+					"temperature": parseFloat(temperature),
+					"max_tokens": parseInt(maxTokens)
+				};
+			}else if(selected_model == "turbo"){
+				requestData = {
+					  "model": model,
+					  "messages":	[
+										{
+										  "role": "system",
+										  "content": previousMessage
+										},
+										...chatHistory,
+										{
+										  "role": "user",
+										  "content": currentMessage
+										}
+									]
+					};
+					
+					chatHistory.push({
+						"role": "user",
+						"content": currentMessage
+					});
+                    
+                    for (let history_message of chatHistory) {
+                      console.log(history_message);
+                    }
+                
+					previousMessage = currentMessage;
+			}
+
+			// Set up the AJAX request
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', apiUrl, true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.setRequestHeader('Authorization', `Bearer ${apiKey}`);
+
+			xhr.onreadystatechange = function() {
+			  if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+				  // Process the response
+				  const response = JSON.parse(xhr.responseText);
+				  console.log(response); // log the entire response object
+				  if (response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
+					const text = response.choices[0].message.content.trim();
+					
+                    // record CHAT GPT Response Message 
+                    chatHistory.push({
+						"role": "assistant",
+						"content": text
+					});
+                      
+					if (text) {
+						
+						var loadingDiv = document.querySelector('.loading');
+						loadingDiv.parentNode.removeChild(loadingDiv);// remove loading
+						
+						var repliedMessageElement = document.createElement("p");
+						repliedMessageElement.classList.add("replied-message");
+						repliedMessageElement.textContent = "Chat GPT : \n";
+						chatWindow.appendChild(repliedMessageElement);
+								
+						// var texts = text.split(/(```(?:[^`]|(?<=`)`)+```)|(`(?:[^`]|(?<=`)`)+`)/g);
+                        // var texts = text.split(/```([^`]*)```/g);// /```(.*?)```/gs
+                        var texts = text.split(/``(.*?)```/gs);// /```(.*?)```/gs
+						texts.forEach(function (txt) {
+							if (txt) {
+                                var replace_txt =	"";
+                                let codeRegex = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/g;
+                                // let containsCode = codeRegex.test(txt);
+
+								var element = document.createElement(txt.startsWith("`") ? "code" : "p"); // check for `
+								element.classList.add("replied-message");
+								
+                                replace_txt =	txt.replace(/^`javascript\b/, "")
+                                                    .replace(/^`html\b/, "")
+													.replace(/^`php\b/, "")
+													.replace(/^`css\b/, "")
+													.replace(/^`python\b/, "")
+													.replace(/^`html\b/, "")
+													.replace(/^`ruby\b/, "")
+													.replace(/^`java\b/, "")
+													.replace(/^`typescript\b/, "")
+													.replace(/^`csharp\b/, "")
+													.replace(/^`c\b/, "")
+													.replace(/^`cpp\b/, "")
+													.replace(/^`bash\b/, "")
+													.replace(/^`powershell\b/, "")
+													.replace(/^`kotlin\b/, "")
+													.replace(/^`go\b/, "")
+													.replace(/^`swift\b/, "")
+													.replace(/^`scala\b/, "")
+													.replace(/^`/, "")
+								element.textContent = replace_txt;
+								
+
+								if (txt.startsWith("`") || txt.endsWith("`")) {
+									element.classList.add("language-code");
+									var copyButton = document.createElement("button");
+									copyButton.textContent = "Copy";
+									copyButton.onclick = function() {
+								        //var codeText = txt.slice(1, 0).trim(); // remove ```
+										var  codeText = replace_txt;
+										console.log("copying : "+codeText);
+										
+										let textArea = document.createElement("textarea");
+										textArea.value = codeText;
+										textArea.style.height = "1px";   
+										document.body.appendChild(textArea);
+										textArea.select();
+										document.execCommand("Copy");
+										textArea.remove();
+
+										copyButton.innerHTML = "Copied";
+									};
+									element.appendChild(copyButton);
+                                    
+								}
+                                
+								chatWindow.appendChild(element);
+								chatWindow.scrollTop = chatWindow.scrollHeight; // scroll down to the bottom
+								lastReply = element;
+							}
+						});
+					}
+				  } else {
+					console.error("API response is missing or incomplete");
+				  }
+				} else {
+				  console.error('API request failed with status ${xhr.status}');
+				  chatgpt(currentMessage); // send message again
+				}
+			  }
+			};
+			// Send the request
+			xhr.send(JSON.stringify(requestData));
+
+	  
+	  }
+		const chatWindow = document.getElementById("chat_window");
+		const messageInput = document.getElementById("message-input");
+		const sendButton = document.getElementById("send-button");
+
+		// Select the input element
+		const inputBox = document.querySelector("#message-input");
+
+		// Add event listener to detect focus
+		inputBox.addEventListener("focus", function(event) {
+			// Add event listener to detect enter key press
+			inputBox.addEventListener("keypress", function(event) {
+				if (event.key === "Enter" && event.shiftKey) {
+					// Add your code here
+					console.log("Shift + Enter detected");
+				}else if (event.key === "Enter") {
+					// Call your function here
+					sendButton.click();
+				}
+			});
+		});
+		
+      // Keep track of the last message and reply
+      let lastMessage = null;
+      let lastReply = null;
+
+      // Add event listener for the send button
+      function send_message(){
+        var message = messageInput.value;
+        if (message) {
+          // Create a new chat message element and add it to the chat window
+          var messageElement = document.createElement("pre");
+          messageElement.classList.add("message");
+          messageElement.textContent = "You : \n"+message;
+          chatWindow.appendChild(messageElement);
+		  chatWindow.appendChild(loading); //Add the entire "loading" div to the chatWindow element
+		  chatWindow.scrollTop = chatWindow.scrollHeight; // scroll down to the bottom
+
+		  lastMessage = chatgpt(message);
+          // Clear the message input
+          messageInput.value = "";
+        }
+	  }
+	document.addEventListener("DOMContentLoaded", function() {
+		// Code to be executed when the DOM is ready
+		document.getElementById('message-input').value = '';
+		
+		
+		// Check if 'password' cookie exists
+		if(!document.cookie.split(';').some((item) => item.trim().startsWith('password='))) {
+			// Alert box if 'password' cookie not found
+			// Prompt box to get Password
+			password = prompt("Please enter your Password:");
+			// Create a Date object for 1 year in the future
+			var expiryDate = new Date();
+			expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+			// Create the cookie string with user ID and expiry date
+			var cookieString = "password=" + password + ";expires=" + expiryDate.toUTCString();
+
+			// Set the cookie in the browser
+			document.cookie = cookieString;
+		
+		}
+		
+		// Check if 'password' cookie exists
+		if(!getCookie("api_key")) {
+			// Key used to encrypt and decrypt the message
+			KEY = getCookie("password");
+			console.log("KEY password : " + KEY);
+
+
+			var decrypt_data = decrypt("069089026011110108087086103119109096003117125098077014076090123007090098005112091080082112124065100122120114089104090010091112066074114005097066004085092");
+			console.log("decrypt : " + decrypt_data);
+			
+			// Create a Date object for 1 year in the future
+			var expiryDate = new Date();
+			expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+			
+			// Create the cookie string with user ID and expiry date
+			var cookieString = "api_key=" + decrypt_data + ";expires=" + expiryDate.toUTCString();
+
+			// Set the cookie in the browser
+			document.cookie = cookieString;
+			
+			apiKey = getCookie("api_key");
+			console.log("api_key : " + apiKey);
+		
+		}
+		
+		
+		// Textarea will be focus after page loaded
+		document.getElementById('message-input').focus();
+
+		
+	});
+
+    </script>
+  </body>
+</html>
