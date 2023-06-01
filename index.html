@@ -4,7 +4,7 @@ Date        Mod By      Log
 20230320    WeiJun      Enhancement for Chat History
 20230531    WeiJun      Addon textarea focus after page load
 20230531    WeiJun      Addon function detect_and_generate_clickable_link() use to check valid link and update it to clickable link
-
+20230601    WeiJun      Fix bug in detect_and_generate_clickable_link, regex
 
 -->
 <html>
@@ -412,7 +412,7 @@ Date        Mod By      Log
             var repliedMessages = document.getElementsByClassName("replied-message");
             for (var i = repliedMessages.length - 1; i < repliedMessages.length; i++) { // only update last row; save cost
             var message = repliedMessages[i].innerHTML;
-            var regex = /(http(s)?:\/\/)?([\da-z-]+\.)+([a-z]{2,6})(\/[\w\.-\?&]*)*\/?/ig;
+            var regex = /(http:\/\/|https:\/\/)[^\s]+/g;
             var replacedMessage = message.replace(regex, "<a href='$&' target='_blank'>$&</a>");
             repliedMessages[i].innerHTML = replacedMessage;
             }
