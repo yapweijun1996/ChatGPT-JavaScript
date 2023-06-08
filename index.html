@@ -5,6 +5,7 @@ Date        Mod By      Log
 20230531    WeiJun      Addon textarea focus after page load
 20230531    WeiJun      Addon function detect_and_generate_clickable_link() use to check valid link and update it to clickable link
 20230601    WeiJun      Fix bug in detect_and_generate_clickable_link, regex
+20230608    WeiJun      Addon Temperature Select Option, Enhance Chat History, Addon Roles Prompt
 
 -->
 <html>
@@ -164,6 +165,61 @@ Date        Mod By      Log
   
     <div id="chat_window" class="chat_window"></div>
 	<div style="height:10px;"></div>
+    
+    <!-- 20230608 [start] addon select option [temperature] -->
+    <table style="table-layout:fixed;width:100%;" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td style="width:300px;height: 100%;">
+                    <label for="chat_gpt_temperature" title="The higher the value, the more creative it becomes.">
+                        Select Temperature for Chat GPT:
+                    </label>
+
+                    <select name="chat_gpt_temperature" id="chat_gpt_temperature">
+                        <option value="0.1">0.1</option>
+                        <option value="0.2">0.2</option>
+                        <option value="0.3">0.3</option>
+                        <option value="0.4">0.4</option>
+                        <option value="0.5" selected>0.5</option>
+                        <option value="0.6">0.6</option>
+                        <option value="0.7">0.7</option>
+                        <option value="0.8">0.8</option>
+                        <option value="0.9">0.9</option>
+                        <option value="1">1.0</option>
+                        <option value="10">10</option>
+                        <option value="100">100</option>
+                        <option value="1000">1000</option>
+                        <option value="10000">10000</option>
+                        <option value="100000">100000</option>
+                    </select>  
+            </td>
+            <td style="width:auto%;height: 100%;text-align: right;">
+            </td>
+        </tr>
+        <tr>
+            <td style="width:300px;height: 100%;">
+                    <label for="chat_gpt_prompt" title="Select Default Prompt">
+                        Select Prompt for Chat GPT:
+                    </label>
+
+                    <select name="chat_gpt_prompt" id="chat_gpt_prompt">
+                        <option value="">None Prompt</option>
+                        <option value="假设你的职业是调查员/调查分析师 (Investigator/Investigation Analyst)。你有有良好的分析思维能力，能够进行复杂的调查和分析，并能够将结果以简单易懂的方式传达给其他人。你也具备良好的沟通能力和写作能力，用清晰、简明的语言传达调查结果。你的每次回答必须最低1000字。你的回答方式必须以,调查员回答:,开头。">调查员/调查分析师</option>
+                        <option value="假设你的职业是一名报告专家。你有良好的逻辑思维能力，能够进行复杂的调查和分析前因后果，并能够将调查结果和信息以简单易懂的方式传达给其他人。你也具备优秀的沟通能力和写作能力，用清晰、简明的语言撰写报告。你的每次回答都是以报告的方式回答。你的回答方式必须以,报告专家回答:,开头。每次回答必须最少1000字。">报告专家</option>
+                        <option value="你的回答必须最少1000字。假设你的职业是一名优秀的作家。你有良好的逻辑思维能力，能够进行复杂的调查和分析前因后果，热爱写作，有创造力和想象力，具备历史、文学、科学等的知识积累，在文学创作中，能够准确地使用背景和描述，突出文学作品的真实性和可信度。你也具备良好的语言表达能力，具备清晰、生动、精练、富有表现力的语言表达能力，使作品能够准确地传达思想和情感，让读者感受到文学作品的美。你也善于观察和思考，从细节中挖掘出作品的主题和意境，创造出更深刻的文学作品。你的回答方式必须以,优秀的作家回答:,开头。">优秀的作家</option>
+                        <option value="
+                        角色设定:信息分析师.信息分析师是指从大量的信息数据中，提取有价值的信息并对其加以分析和评估，得出一定结论的专业人员。他们的目的通常是支持一项特定业务或项目的发展，或提供策略性决策支持。信息分析师通常需要使用各种工具和技术来处理和分析数据，例如数据挖掘、数据分析和数据可视化等。他们需要具备专业知识和技能，以能够筛选非常复杂的数据，识别出隐藏的关联性，发现数据中的不一致性和偏差。信息分析师也需要将得到的信息整合，以帮助决策者做出正确的决策。信息分析师可以在各种各样的领域工作，例如金融、物流、市场营销、零售、医疗等。他们通常需要与业务部门和高层领导合作，以制定业务战略、推动创新和优化业务流程。
+                        总之，信息分析师是指能够以数据分析的方式快速处理和提取价值信息，从而帮助机构做出更多高质量决策的专业人员。假设你的角色是一名信息分析师， 请你用信息分析师的回答方式回答我。你的回答方式必须以,信息分析师回答:,开头。">信息分析师</option>
+                        <option value="
+                        角色设定:报告专家。报告专家是指以下步骤来撰写报告，收集和整理相关资料：收集与报告相关的信息和数据，并对其进行整理、分类、筛选和分析，以便在报告中进行准确的陈述和说明。制定报告的大纲和结构：依据报告的目的和受众，制定相应报告的大纲和结构，以便有条理地呈现信息和数据。编写报告正文：根据大纲，逐步撰写报告的正文，内容应当准确、简明、清晰、逻辑严密。补充图表说明：利用图表和表格等方式，便于受众对信息进行理解和比较。审核和修订：对报告进行审核和修订，确保其准确性和完整性。假设你的角色是一名报告专家， 请你用报告的方式回答我。你的回答方式必须以,报告专家回答:,为开头，以，累计字数和要求字数，为结尾。我要求的报告字数是25000字，你先写500字。主题是：什么是水？">报告专家v2</option>
+                    </select>  
+            </td>
+            <td style="width:auto%;height: 100%;text-align: right;">
+            </td>
+        </tr>
+    </table>
+    <!-- 20230608 [end  ] addon select option [temperature] -->
+
+      
 	<table style="table-layout:fixed;width:100%;height: 10vh;" cellpadding="0" cellspacing="0" border="0">
 		<tr>
 			<td style="width:85%;height: 100%;">
@@ -179,6 +235,7 @@ Date        Mod By      Log
         
 	var currentMessage = "";
 	let previousMessage = "";
+	let role_system_content = ""; // 20230608
 	let chatHistory = [];
 	var password = "";
 	var KEY = "";
@@ -259,8 +316,24 @@ Date        Mod By      Log
 			// Set up the request data
 			const prompt = 'how old are you';
 			const maxTokens = 4096;
-			const temperature = 0.9;
-
+			var temperature = 0.5; // Default 0.5 
+            
+            // 20230608 [start] addon chat_gpt_temperature
+            var chat_gpt_temperature = document.getElementById("chat_gpt_temperature");
+            if(chat_gpt_temperature){
+                temperature = chat_gpt_temperature.value; // Update
+            }
+            console.log("Chat GPT temperature : " + temperature);
+            // 20230608 [start] addon chat_gpt_temperature
+          
+            // 20230608 [start] addon chat_gpt_prompt
+            var chat_gpt_prompt = document.getElementById("chat_gpt_prompt");
+            if(chat_gpt_prompt){
+                role_system_content = chat_gpt_prompt.value; // Update
+            }
+            console.log("Chat GPT Prompt : " + role_system_content);
+            // 20230608 [end  ] addon chat_gpt_prompt
+            
 			var requestData = {};
 				
 			if(selected_model == "davinci"){
@@ -276,7 +349,7 @@ Date        Mod By      Log
 					  "messages":	[
 										{
 										  "role": "system",
-										  "content": previousMessage
+										  "content": role_system_content
 										},
 										...chatHistory,
 										{
@@ -285,11 +358,13 @@ Date        Mod By      Log
 										}
 									]
 					};
+                    console.log(requestData.messages.find(message => message.role === 'system').content);
 					
-					chatHistory.push({
+                    chatHistory.push({
 						"role": "user",
 						"content": currentMessage
 					});
+                        
                     
                     for (let history_message of chatHistory) {
                       console.log(history_message);
@@ -313,12 +388,6 @@ Date        Mod By      Log
 				  if (response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
 					const text = response.choices[0].message.content.trim();
 					
-                    // record CHAT GPT Response Message 
-                    chatHistory.push({
-						"role": "assistant",
-						"content": text
-					});
-                      
 					if (text) {
 						
 						var loadingDiv = document.querySelector('.loading');
@@ -362,6 +431,13 @@ Date        Mod By      Log
 													.replace(/^`/, "")
 								element.textContent = replace_txt;
 								
+                                if(replace_txt != ""){
+                                    // record CHAT GPT Response Message 
+                                    chatHistory.push({
+                                        "role": "assistant",
+                                        "content": txt
+                                    });
+                                }
 
 								if (txt.startsWith("`") || txt.endsWith("`")) {
 									element.classList.add("language-code");
