@@ -6,6 +6,7 @@ Date        Mod By      Log
 20230531    WeiJun      Addon function detect_and_generate_clickable_link() use to check valid link and update it to clickable link
 20230601    WeiJun      Fix bug in detect_and_generate_clickable_link, regex
 20230608    WeiJun      Addon Temperature Select Option, Enhance Chat History, Addon Roles Prompt
+20230708    WeiJun      Addon Chat GPT Model Select Option and default it as GPT 4
 
 -->
 <html>
@@ -174,6 +175,20 @@ Date        Mod By      Log
         <tr>
             <td style="width:auto;height: 100%;">
                     <label for="chat_gpt_temperature" title="The higher the value, the more creative it becomes.">
+                        Select Model:
+                    </label>
+
+                    <select name="chat_gpt_model" id="chat_gpt_model">
+                        <option value="gpt3_5"       >GPT 3.5</option>
+                        <option value="gpt4" selected>GPT 4</option>
+                    </select>  
+            </td>
+            <td style="width:1px;height: 100%;text-align: right;">
+            </td>
+        </tr>
+        <tr>
+            <td style="width:auto;height: 100%;">
+                    <label for="chat_gpt_temperature" title="The higher the value, the more creative it becomes.">
                         Select Temperature for Chat GPT:
                     </label>
 
@@ -205,7 +220,7 @@ Date        Mod By      Log
                     </label>
 
                     <select name="chat_gpt_prompt" id="chat_gpt_prompt">
-                        <option value="">None Prompt</option>
+                        <option value="" selected>None Prompt</option>
                         <option value="I will provide INPUT. Help me fix my INPUT grammar issues if any, and do corrections if have any errors. And also an explanation of the grammar logic and provide some example sentences for me to learn more about my mistake if any. My INPUT is :">Fix Grammar</option>
                         <option value="假设你的职业是调查员/调查分析师 (Investigator/Investigation Analyst)。你有有良好的分析思维能力，能够进行复杂的调查和分析，并能够将结果以简单易懂的方式传达给其他人。你也具备良好的沟通能力和写作能力，用清晰、简明的语言传达调查结果。你的每次回答必须最低1000字。你的回答方式必须以,调查员回答:,开头。">调查员/调查分析师</option>
                         <option value="假设你的职业是一名报告专家。你有良好的逻辑思维能力，能够进行复杂的调查和分析前因后果，并能够将调查结果和信息以简单易懂的方式传达给其他人。你也具备优秀的沟通能力和写作能力，用清晰、简明的语言撰写报告。你的每次回答都是以报告的方式回答。你的回答方式必须以,报告专家回答:,开头。每次回答必须最少1000字。">报告专家</option>
@@ -324,7 +339,21 @@ Date        Mod By      Log
 			const prompt = 'how old are you';
 			const maxTokens = 4096;
 			var temperature = 0.5; // Default 0.5 
-            
+          
+            // 20230708 [start] addon chat_gpt_model
+            var chat_gpt_model = document.getElementById("chat_gpt_model");
+            if(chat_gpt_model){
+                if(chat_gpt_model.value == "gpt3_5"){
+                    apiUrl = 'https://api.openai.com/v1/chat/completions';
+                    model = 'gpt-3.5-turbo';
+                }else if(chat_gpt_model.value == "gpt4"){
+                    apiUrl = 'https://api.openai.com/v1/chat/completions';
+                    model = 'gpt-4';
+                }
+                console.log("Chat GPT Model : " + chat_gpt_model.value);
+            }
+            // 20230708 [start] addon chat_gpt_model
+          
             // 20230608 [start] addon chat_gpt_temperature
             var chat_gpt_temperature = document.getElementById("chat_gpt_temperature");
             if(chat_gpt_temperature){
