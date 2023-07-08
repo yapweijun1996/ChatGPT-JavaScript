@@ -179,9 +179,10 @@ Date        Mod By      Log
                     </label>
 
                     <select name="chat_gpt_model" id="chat_gpt_model">
-                        <option value="gpt3_5" selected>GPT 3.5</option>
-                        <option value="gpt4"           >GPT 4</option>
-                    </select>  
+                        <option value="gpt3_5" selected>GPT 3.5 [Faster] </option>
+                        <option value="gpt3_5_16_k"    >GPT 3.5 16k [Faster with more text]</option>
+                        <option value="gpt4"           >GPT 4 [Slower]</option>
+                    </select>
             </td>
             <td style="width:1px;height: 100%;text-align: right;">
             </td>
@@ -349,6 +350,9 @@ Date        Mod By      Log
                 }else if(chat_gpt_model.value == "gpt4"){
                     apiUrl = 'https://api.openai.com/v1/chat/completions';
                     model = 'gpt-4';
+                }else if(chat_gpt_model.value == "gpt3_5_16_k"){
+                    apiUrl = 'https://api.openai.com/v1/chat/completions';
+                    model = 'gpt-3.5-turbo-16k';
                 }
                 console.log("Chat GPT Model : " + chat_gpt_model.value);
             }
