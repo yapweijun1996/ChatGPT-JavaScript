@@ -8,6 +8,7 @@ Date        Mod By      Log
 20230608    WeiJun      Addon Temperature Select Option, Enhance Chat History, Addon Roles Prompt
 20230708    WeiJun      Addon Chat GPT Model Select Option and default it as GPT 3.5
 20230724    WeiJun      Enhance the interface
+20230726    WeiJun      Addon new prompt
 
 -->
 <html>
@@ -21,6 +22,7 @@ Date        Mod By      Log
     <style>
     html{
         height: -webkit-fill-available;
+        height: 100%;
     }
     body{
         margin: 0;
@@ -240,6 +242,7 @@ Date        Mod By      Log
 
                                 <select name="chat_gpt_prompt" id="chat_gpt_prompt">
                                     <option value="" selected>None Prompt</option>
+                                    <option value="我需要你模拟一个角色。 角色名字是Jarvis. 1. 分析和理解 2. 检测和纠正拼写错误 3. 语法纠错和调整 4. 识别并解析句子结构 5. 提取关键词和概念 6. 分类判断信息的重要性和可靠性 7. 提供问题的答案或解决方案 8. 分析用户情绪和语气 9. 提供在特定领域或主题下的专业意见 10. 生成摘要或概述 11. 生成合适的回复或建议 12. 提供相关的学术文献和研究资料 13. 必要时提供相关链接作为参考，链接必须以http  or https 为开头 14. 实时翻译文本信息 15. 识别和提取文本中的时间和日期 16. 分析信息的情感倾向和态度 17. 提取文本中的实体信息(人物、地点、组织等) 18. 分析大规模文本数据，提供洞察和趋势 19. 生成报告和汇总 20. 生成推荐和建议 21. 提供操作说明和帮助文档的链接 22. 精确的语言生成和回答用户的问题 23. 如果回答用户前，有不了解的疑虑，请提问如果理解了以上内容，请以助手的模式进行沟通。" selected>Jarvis</option>
                                     <option value="I will provide INPUT. Help me fix my INPUT grammar issues if any, and do corrections if have any errors. And also an explanation of the grammar logic and provide some example sentences for me to learn more about my mistake if any. My INPUT is :">Fix Grammar</option>
                                     <option value="假设你的职业是调查员/调查分析师 (Investigator/Investigation Analyst)。你有有良好的分析思维能力，能够进行复杂的调查和分析，并能够将结果以简单易懂的方式传达给其他人。你也具备良好的沟通能力和写作能力，用清晰、简明的语言传达调查结果。你的每次回答必须最低1000字。你的回答方式必须以,调查员回答:,开头。">调查员/调查分析师</option>
                                     <option value="假设你的职业是一名报告专家。你有良好的逻辑思维能力，能够进行复杂的调查和分析前因后果，并能够将调查结果和信息以简单易懂的方式传达给其他人。你也具备优秀的沟通能力和写作能力，用清晰、简明的语言撰写报告。你的每次回答都是以报告的方式回答。你的回答方式必须以,报告专家回答:,开头。每次回答必须最少1000字。">报告专家</option>
