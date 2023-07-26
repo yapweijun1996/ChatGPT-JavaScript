@@ -8,7 +8,8 @@ Date        Mod By      Log
 20230608    WeiJun      Addon Temperature Select Option, Enhance Chat History, Addon Roles Prompt
 20230708    WeiJun      Addon Chat GPT Model Select Option and default it as GPT 3.5
 20230724    WeiJun      Enhance the interface
-20230726    WeiJun      Addon new prompt
+20230725    WeiJun      Addon new prompt
+20230726    WeiJun      Enhance code output interface and copy code function
 
 -->
 <html>
@@ -29,8 +30,10 @@ Date        Mod By      Log
         height: 100%;
     }
 	code.language-code{
-		width: 90%;
+		width: 100%;
 		display: block;
+        box-sizing: border-box;
+        padding: 20px;
 		padding-top: 40px;
 		padding-bottom: 30px;
 	}
@@ -40,15 +43,14 @@ Date        Mod By      Log
 		font-size: 14px;
 		font-family: 'Courier New', Courier, monospace;
 		overflow: auto;
-		margin-left: 10px;
 		position: relative; /* used for positioning the copy button */
 		border-radius: 15px;
 	}
 
-	code.replied-message.language-code button {
-	  position: absolute;
-	  right: 10px;
-	  top: 10px;
+    button.code_copy_button {
+	  position: relative;
+	  left: -20px;
+	  top: 37px;
 	  background-color: #ff7f50;
 	  color: #fff;
 	  padding: 5px 10px;
@@ -56,11 +58,17 @@ Date        Mod By      Log
 	  border-radius: 3px;
 	  font-size: 14px;
 	  cursor: pointer;
+	  z-index: 1;
+	  float: right;
 	}
 
-	code.replied-message.language-code button:hover {
+	button.code_copy_button:hover {
 	  background-color: #ffa07a;
 	}
+        
+    div.div_code{
+        padding: 0px 10px;
+    }
 
 
 	.loading {
@@ -509,26 +517,18 @@ Date        Mod By      Log
 									element.classList.add("language-code");
 									var copyButton = document.createElement("button");
 									copyButton.textContent = "Copy";
-									copyButton.onclick = function() {
-								        //var codeText = txt.slice(1, 0).trim(); // remove ```
-										var  codeText = replace_txt;
-										console.log("copying : "+codeText);
-										
-										let textArea = document.createElement("textarea");
-										textArea.value = codeText;
-										textArea.style.height = "1px";   
-										document.body.appendChild(textArea);
-										textArea.select();
-										document.execCommand("Copy");
-										textArea.remove();
-
-										copyButton.innerHTML = "Copied";
-									};
-									element.appendChild(copyButton);
+									copyButton.classList.add("code_copy_button");
+                                    chatWindow.appendChild(copyButton);
                                     
+                                    
+                                    var div_element = document.createElement("div");
+									div_element.classList.add("div_code");
+								    div_element.appendChild(element);
+                                    element = div_element;
 								}
                                 
 								chatWindow.appendChild(element);
+                                if (txt.startsWith("`") || txt.endsWith("`")) {setTimeout(function() {reset_code_copy_buttun_status();}, 100);}
 								chatWindow.scrollTop = chatWindow.scrollHeight; // scroll down to the bottom
 								lastReply = element;
                                 detect_and_generate_clickable_link();
@@ -602,6 +602,28 @@ Date        Mod By      Log
           messageInput.value = "";
         }
 	  }
+        
+    function reset_code_copy_buttun_status(){
+        // Get all buttons with the class name "code_copy_button"
+        const code_copy_button = document.getElementsByClassName("code_copy_button");
+        const code_area = document.getElementsByClassName("language-code");
+        
+        // Iterate through the buttons and add event listeners
+        for (let i = 0; i < code_copy_button.length; i++) {
+          code_copy_button[i].addEventListener("click", function() {
+            console.log("copying : "+code_area[i].innerHTML);
+
+            let textArea = document.createElement("textarea");
+            textArea.value = code_area[i].innerHTML;
+            textArea.style.height = "1px";   
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("Copy");
+            textArea.remove();
+
+          });
+        }
+    }
 	document.addEventListener("DOMContentLoaded", function() {
 		// Code to be executed when the DOM is ready
 		document.getElementById('message-input').value = '';
