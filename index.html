@@ -612,9 +612,25 @@ Date        Mod By      Log
         for (let i = 0; i < code_copy_button.length; i++) {
           code_copy_button[i].addEventListener("click", function() {
             console.log("copying : "+code_area[i].innerHTML);
+            let data_to_copy = code_area[i].innerHTML;
+
+            // Create a dictionary of HTML entities and their corresponding characters
+            var entities = {
+              "&lt;": "<",
+              "&gt;": ">",
+              "&amp;": "&",
+              "&quot;": "\"",
+              "&apos;": "'"
+            };
+
+            // Replace HTML entities with their corresponding characters
+            for (var entity in entities) {
+              var character = entities[entity];
+              data_to_copy = data_to_copy.replace(new RegExp(entity, "g"), character);
+            }
 
             let textArea = document.createElement("textarea");
-            textArea.value = code_area[i].innerHTML;
+            textArea.value = data_to_copy;
             textArea.style.height = "1px";   
             document.body.appendChild(textArea);
             textArea.select();
