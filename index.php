@@ -11,19 +11,36 @@ Date        Mod By      Log
 20230725    WeiJun      Addon new prompt
 20230726    WeiJun      Enhance code output interface and copy code function
 20230728    WeiJun      Addon Local Storage 
+20230729    WeiJun      Allow Cache 
 
 -->
+
 <?php
-// Set the content type
-header('Content-type: text/html');
+// [start] Allow Cache 
+// Set the timezone and enable caching
+date_default_timezone_set('GMT');
+header('Cache-Control: public');
+header('Expires: ' . gmdate('D, d M Y H:i:s', strtotime('+1 year')) . ' GMT');
 
-// Define the cache control and expiration headers
-header('Cache-Control: public'); // Enable caching in public caches
-header('Expires: Thu, 01 Jan 2050 00:00:00 GMT'); // Set the expiration time to January 1, 2050
+// Check if the browser's cache is still valid.
+$lastModified = filemtime(__FILE__); // check current file last modified time
+$etag = md5_file(__FILE__); // create a md5 hash
 
-// Output your content here
-echo 'Hello, World!';
+header("Last-Modified: " . gmdate("D, d M Y H:i:s", $lastModified) . " GMT");
+header("ETag: $etag");
+
+// Implement conditional caching
+if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+    if ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == gmdate("D, d M Y H:i:s", $lastModified) . ' GMT' ||
+        trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag
+    ) {
+        header("HTTP/1.1 304 Not Modified");
+        exit;
+    }
+}
+// [end  ] Allow Cache 
 ?>
+
 <html>
   <head>
 	<meta charset="UTF-8">
