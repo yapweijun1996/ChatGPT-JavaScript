@@ -1,21 +1,15 @@
-<!DOCTYPE html>
-<!-- 
-Date        Mod By      Log
-20230320    WeiJun      Enhancement for Chat History
-20230531    WeiJun      Addon textarea focus after page load
-20230531    WeiJun      Addon function detect_and_generate_clickable_link() use to check valid link and update it to clickable link
-20230601    WeiJun      Fix bug in detect_and_generate_clickable_link, regex
-20230608    WeiJun      Addon Temperature Select Option, Enhance Chat History, Addon Roles Prompt
-20230708    WeiJun      Addon Chat GPT Model Select Option and default it as GPT 3.5
-20230724    WeiJun      Enhance the interface
-20230725    WeiJun      Addon new prompt
-20230726    WeiJun      Enhance code output interface and copy code function
-20230728    WeiJun      Addon Local Storage 
-20230729    WeiJun      Allow Cache 
-
--->
-
 <?php
+// [start] allow gzip
+header('Content-Encoding: gzip');
+ob_start('ob_gzhandler');
+// [end  ] allow gzip
+
+// [start] Display All Message in php server
+/*foreach ($_SERVER as $key => $value) {
+    echo $key . " : " . $value . "<br>";
+}*/
+// [end  ] Display All Message in php server
+
 // [start] Allow Cache 
 // Set the timezone and enable caching
 date_default_timezone_set('GMT');
@@ -40,6 +34,22 @@ if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MA
 }
 // [end  ] Allow Cache 
 ?>
+<!DOCTYPE html>
+<!-- 
+Date        Mod By      Log
+20230320    WeiJun      Enhancement for Chat History
+20230531    WeiJun      Addon textarea focus after page load
+20230531    WeiJun      Addon function detect_and_generate_clickable_link() use to check valid link and update it to clickable link
+20230601    WeiJun      Fix bug in detect_and_generate_clickable_link, regex
+20230608    WeiJun      Addon Temperature Select Option, Enhance Chat History, Addon Roles Prompt
+20230708    WeiJun      Addon Chat GPT Model Select Option and default it as GPT 3.5
+20230724    WeiJun      Enhance the interface
+20230725    WeiJun      Addon new prompt
+20230726    WeiJun      Enhance code output interface and copy code function
+20230728    WeiJun      Addon Local Storage 
+20230729    WeiJun      Allow Cache, gzip
+
+-->
 
 <html>
   <head>
