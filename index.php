@@ -13,10 +13,22 @@ Date        Mod By      Log
 20230728    WeiJun      Addon Local Storage 
 
 -->
+<?php
+// Set the content type
+header('Content-type: text/html');
+
+// Define the cache control and expiration headers
+header('Cache-Control: public'); // Enable caching in public caches
+header('Expires: Thu, 01 Jan 2050 00:00:00 GMT'); // Set the expiration time to January 1, 2050
+
+// Output your content here
+echo 'Hello, World!';
+?>
 <html>
   <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="expires" content="Sat, 01 Jan 2050 1:00:00 GMT" />
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
       
