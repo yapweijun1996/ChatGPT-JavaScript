@@ -48,6 +48,7 @@ Date        Mod By      Log
 20230726    WeiJun      Enhance code output interface and copy code function
 20230728    WeiJun      Addon Local Storage 
 20230729    WeiJun      Allow Cache, gzip
+20230815    WeiJun      Addon Model GPT4 32k
 
 -->
 
@@ -301,6 +302,7 @@ Date        Mod By      Log
                                 <option value="gpt3_5"      selected>GPT 3.5 [Faster] </option>
                                 <option value="gpt3_5_16_k"         >GPT 3.5 16k [Faster with more text]</option>
                                 <option value="gpt4"                >GPT 4 [Slower]</option>
+                                <option value="gpt4_32_k"           >GPT 4 32k [Slower with more text]</option>
                             </select>
                             <script>load_selected_option("chat_gpt_model");</script>
                         </td>
@@ -484,6 +486,9 @@ Date        Mod By      Log
                 }else if(chat_gpt_model.value == "gpt3_5_16_k"){
                     apiUrl = 'https://api.openai.com/v1/chat/completions';
                     model = 'gpt-3.5-turbo-16k';
+                }else if(chat_gpt_model.value == "gpt4_32_k"){
+                    apiUrl = 'https://api.openai.com/v1/chat/completions';
+                    model = 'gpt-4-32k';
                 }
                 console.log("Chat GPT Model : " + chat_gpt_model.value);
             }
