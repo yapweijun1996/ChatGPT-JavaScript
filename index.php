@@ -300,8 +300,8 @@ Date        Mod By      Log
                                 function delete_chat_history(){
                                     let temp_text = "Are you sure to delete the Chat History?";
                                     if (confirm(temp_text) == true) {
-                                        delete_item('localstorage_chatHistory');
-                                        delete_item('chat_window_html');
+                                        delete_item('localstorage_chatHistory_'+browser_tab_id);
+                                        delete_item('chat_window_html_'+browser_tab_id);
                                         location.reload();
                                     }else {
                                         
@@ -409,6 +409,20 @@ Date        Mod By      Log
     
     
     <script>
+    //20230921 [start] browser tab id 
+    // Check if tab ID exists in sessionStorage
+    let browser_tab_id = window.sessionStorage.getItem('tabId');
+
+    if (!browser_tab_id) {
+      // Generate a new ID for the tab
+      browser_tab_id = Math.random().toString(36).substr(2, 9);
+
+      // Store the tab ID in sessionStorage
+      window.sessionStorage.setItem('browser_tab_id', browser_tab_id);
+    }
+
+    console.log('Tab ID:', browser_tab_id);
+    //20230921 [start] browser tab id 
         
 	var currentMessage = "";
 	let previousMessage = "";
@@ -534,8 +548,8 @@ Date        Mod By      Log
 			var requestData = {};
             
             // 20230921 [start] addon chatHistory to localstorage
-            var localstorage_chatHistory_check = check_item("localstorage_chatHistory");
-            var localstorage_chatHistory = read_item("localstorage_chatHistory");
+            var localstorage_chatHistory_check = check_item("localstorage_chatHistory_"+browser_tab_id);
+            var localstorage_chatHistory = read_item("localstorage_chatHistory_"+browser_tab_id);
             
             if(localstorage_chatHistory_check == true){
                 if (localstorage_chatHistory.length === 0) {
@@ -582,7 +596,7 @@ Date        Mod By      Log
 					});
                     
                     var chatHistory_json_stringify = JSON.stringify(chatHistory);
-                    write_item("localstorage_chatHistory",chatHistory_json_stringify);
+                    write_item("localstorage_chatHistory_"+browser_tab_id,chatHistory_json_stringify);
                         
                     for (let history_message of chatHistory) {
                       console.log(history_message);
@@ -681,7 +695,7 @@ Date        Mod By      Log
                                 detect_and_generate_clickable_link();
                                 
                                 var chatWindow_innerHTML = chatWindow.innerHTML;
-                                write_item("chat_window_html", chatWindow_innerHTML);
+                                write_item("chat_window_html_"+browser_tab_id, chatWindow_innerHTML);
 							}
 						});
 					}
@@ -718,8 +732,8 @@ Date        Mod By      Log
 		const inputBox = document.querySelector("#message-input");
         
         // 20230921 [start] addon chatHistory to localstorage
-        var localstorage_chat_window_html_check = check_item("chat_window_html");
-        var localstorage_chat_window_html = read_item("chat_window_html");
+        var localstorage_chat_window_html_check = check_item("chat_window_html_"+browser_tab_id);
+        var localstorage_chat_window_html = read_item("chat_window_html_"+browser_tab_id);
         if(localstorage_chat_window_html_check == true){
             if (localstorage_chat_window_html == null) {
                 //console.log("localstorage_chat_window_html is empty");
@@ -732,6 +746,7 @@ Date        Mod By      Log
                     //console.log("chatWindow is empty");
                     //console.log(localstorage_chat_window_html);
                     chatWindow.innerHTML = localstorage_chat_window_html;
+                    chatWindow.scrollTop = chatWindow.scrollHeight; // scroll down to the bottom
                 }
             }
         }
