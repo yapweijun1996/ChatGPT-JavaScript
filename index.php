@@ -323,7 +323,6 @@ Date        Mod By      Log
                                 <option value="gpt3_5"      selected>GPT 3.5 [Faster] </option>
                                 <option value="gpt3_5_16_k"         >GPT 3.5 16k [Faster with more text]</option>
                                 <option value="gpt4"                >GPT 4 [Slower]</option>
-                                <option value="gpt4_32_k"           >GPT 4 32k [Slower with more text]</option>
                             </select>
                             <script>load_selected_option("chat_gpt_model");</script>
                         </td>
@@ -366,6 +365,7 @@ Date        Mod By      Log
 
                             <select name="chat_gpt_prompt" id="chat_gpt_prompt" onchange="selected_option(this);">
                                 <option value="" selected>None Prompt</option>
+                                <option value="1. 我会给予一个数字(eg: 3) 2.你需要随机生成其数字(eg: 3个)英语单词 3.对其英语单词加以解释其意思，使用场景，语法，等信息 4.对其单词列出5个常用句子并且加以解释其意思，语法，等信息 5. 使用中文来解释">每日英语</option>
                                 <option value="我需要你模拟一个角色。 角色名字是Jarvis. 1. 分析和理解 2. 检测和纠正拼写错误 3. 语法纠错和调整 4. 识别并解析句子结构 5. 提取关键词和概念 6. 分类判断信息的重要性和可靠性 7. 提供问题的答案或解决方案 8. 分析用户情绪和语气 9. 提供在特定领域或主题下的专业意见 10. 生成摘要或概述 11. 生成合适的回复或建议 12. 提供相关的学术文献和研究资料 13. 必要时提供相关链接作为参考，链接必须以http  or https 为开头 14. 实时翻译文本信息 15. 识别和提取文本中的时间和日期 16. 分析信息的情感倾向和态度 17. 提取文本中的实体信息(人物、地点、组织等) 18. 分析大规模文本数据，提供洞察和趋势 19. 生成报告和汇总 20. 生成推荐和建议 21. 提供操作说明和帮助文档的链接 22. 精确的语言生成和回答用户的问题 23. 如果回答用户前，有不了解的疑虑，请提问如果理解了以上内容，请以助手的模式进行沟通。">Jarvis</option>
                                 <option value="I need you to simulate a role. The character's name is a Web Developer specializing in JavaScript, CSS, and HTML. Don't use API. I will provide you with my requirements and detailed information. Your task is to use HTML, CSS, and JavaScript to help me create a web page. All of the code must be written in as much detail and completeness as possible. If my requirements seem too simple, you can add more functionality and improve upon them. Your goal is to perfect my requirements to the best of your ability. When writing the code, you must consider the user experience and all aspects of future maintenance, in order to avoid the need for subsequent engineers to clean up after you. Let's start by creating a web page using the provided information:">Web Developer</option>
                                 <option value="I will provide INPUT. Help me fix my INPUT grammar issues if any, and do corrections if have any errors. And also an explanation of the grammar logic and provide some example sentences for me to learn more about my mistake if any. My INPUT is :">Fix Grammar</option>
