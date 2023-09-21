@@ -49,6 +49,7 @@ Date        Mod By      Log
 20230728    WeiJun      Addon Local Storage 
 20230729    WeiJun      Allow Cache, gzip
 20230815    WeiJun      Addon Model GPT4 32k
+20230921    WeiJun      Addon Chat History Function
 
 -->
 
@@ -294,6 +295,26 @@ Date        Mod By      Log
                 <table style="width:100%;" cellpadding="0" cellspacing="0" border="0" class="tb_style">
                     <tr>
                         <td style="width:auto;height: 100%;">
+                            <input type="button" value="Delete Chat History" onclick="delete_chat_history();">
+                            <script>
+                                function delete_chat_history(){
+                                    let temp_text = "Are you sure to delete the Chat History?";
+                                    if (confirm(temp_text) == true) {
+                                        delete_item('localstorage_chatHistory');
+                                        delete_item('chat_window_html');
+                                        location.reload();
+                                    }else {
+                                        
+                                    }
+                                }
+                            </script>
+                        </td>
+                        <td style="width:1px;height: 100%;text-align: right;">
+                        </td>
+                    </tr>
+                    <tr style="height:5px;"></tr>
+                    <tr>
+                        <td style="width:auto;height: 100%;">
                             <label for="chat_gpt_temperature" title="The higher the value, the more creative it becomes.">
                                 Select Model:
                             </label>
@@ -511,6 +532,24 @@ Date        Mod By      Log
             // 20230608 [end  ] addon chat_gpt_prompt
             
 			var requestData = {};
+            
+            // 20230921 [start] addon chatHistory to localstorage
+            var localstorage_chatHistory_check = check_item("localstorage_chatHistory");
+            var localstorage_chatHistory = read_item("localstorage_chatHistory");
+            
+            if(localstorage_chatHistory_check == true){
+                if (localstorage_chatHistory.length === 0) {
+                    //console.log("localstorage_chatHistory is empty");
+                } else {
+                    //console.log("localstorage_chatHistory is not empty");
+                    //console.log(typeof localstorage_chatHistory);
+                    //console.log(localstorage_chatHistory);
+                    
+                    var localstorage_chatHistory_json_parse = JSON.parse(localstorage_chatHistory);
+                    chatHistory = localstorage_chatHistory_json_parse;
+                }
+            }
+            // 20230921 [end  ] addon chatHistory to localstorage
 				
 			if(selected_model == "davinci"){
 				requestData = {
@@ -536,12 +575,15 @@ Date        Mod By      Log
 					};
                     console.log(requestData.messages.find(message => message.role === 'system').content);
 					
+                
                     chatHistory.push({
 						"role": "user",
 						"content": currentMessage
 					});
-                        
                     
+                    var chatHistory_json_stringify = JSON.stringify(chatHistory);
+                    write_item("localstorage_chatHistory",chatHistory_json_stringify);
+                        
                     for (let history_message of chatHistory) {
                       console.log(history_message);
                     }
@@ -566,8 +608,10 @@ Date        Mod By      Log
 					
 					if (text) {
 						
-						var loadingDiv = document.querySelector('.loading');
-						loadingDiv.parentNode.removeChild(loadingDiv);// remove loading
+						try{
+				            var loadingDiv = document.querySelector('.loading');
+                            loadingDiv.parentNode.removeChild(loadingDiv);// remove loading
+                        }catch{}
 						
 						var repliedMessageElement = document.createElement("p");
 						repliedMessageElement.classList.add("replied-message");
@@ -630,10 +674,14 @@ Date        Mod By      Log
 								}
                                 
 								chatWindow.appendChild(element);
+                                
                                 if (txt.startsWith("`") || txt.endsWith("`")) {setTimeout(function() {reset_code_copy_buttun_status();}, 100);}
 								chatWindow.scrollTop = chatWindow.scrollHeight; // scroll down to the bottom
 								lastReply = element;
                                 detect_and_generate_clickable_link();
+                                
+                                var chatWindow_innerHTML = chatWindow.innerHTML;
+                                write_item("chat_window_html", chatWindow_innerHTML);
 							}
 						});
 					}
@@ -668,6 +716,26 @@ Date        Mod By      Log
 
 		// Select the input element
 		const inputBox = document.querySelector("#message-input");
+        
+        // 20230921 [start] addon chatHistory to localstorage
+        var localstorage_chat_window_html_check = check_item("chat_window_html");
+        var localstorage_chat_window_html = read_item("chat_window_html");
+        if(localstorage_chat_window_html_check == true){
+            if (localstorage_chat_window_html == null) {
+                //console.log("localstorage_chat_window_html is empty");
+            } else {
+                //console.log("localstorage_chat_window_html is not empty");
+                //console.log(typeof localstorage_chat_window_html);
+                //console.log(localstorage_chat_window_html);
+                
+                if(chatWindow.innerHTML == ""){
+                    //console.log("chatWindow is empty");
+                    //console.log(localstorage_chat_window_html);
+                    chatWindow.innerHTML = localstorage_chat_window_html;
+                }
+            }
+        }
+        // 20230921 [start] addon chatHistory to localstorage
 
 		// Add event listener to detect focus
 		inputBox.addEventListener("focus", function(event) {
