@@ -50,6 +50,7 @@ Date        Mod By      Log
 20230729    WeiJun      Allow Cache, gzip
 20230815    WeiJun      Addon Model GPT4 32k
 20230921    WeiJun      Addon Chat History Function
+20230922    WeiJun      Enhance Chat History Function by window.name
 
 -->
 
@@ -230,6 +231,22 @@ Date        Mod By      Log
     }
     </style>
     <script>
+    //20230921 [start] browser tab id 
+    // Check if tab ID exists in sessionStorage
+    //let browser_tab_id = window.sessionStorage.getItem('tabId');
+    let browser_tab_id = window.name;
+
+    if (!browser_tab_id) {
+      // Generate a new ID for the tab
+      browser_tab_id = Math.random().toString(36).substr(2, 9);
+
+      // Store the tab ID in sessionStorage
+      //window.sessionStorage.setItem('browser_tab_id', browser_tab_id);
+      window.name = browser_tab_id;
+    }
+
+    console.log('Tab ID:' + browser_tab_id);
+    //20230921 [start] browser tab id 
     // Managing Data in Local Storage with JavaScript [start]
     function write_item(id,data){
         localStorage.setItem(id, data);
@@ -266,13 +283,13 @@ Date        Mod By      Log
       var id = element.id;
       var data = element.value;
 
-      write_item(id,data);
+      write_item(id+"_"+browser_tab_id,data);
       console.log("Set Option : "+ data);
     }
 
     function load_selected_option(id){
-      var data   = read_item(id);
-      var status = check_item(id);
+      var data   = read_item(id+"_"+browser_tab_id);
+      var status = check_item(id+"_"+browser_tab_id);
       console.log("Load Option : "+ data);
       if(status == true){
          try {document.getElementById(id).value = data;}catch(err) {console.error(err);}
@@ -409,21 +426,6 @@ Date        Mod By      Log
     
     
     <script>
-    //20230921 [start] browser tab id 
-    // Check if tab ID exists in sessionStorage
-    let browser_tab_id = window.sessionStorage.getItem('tabId');
-
-    if (!browser_tab_id) {
-      // Generate a new ID for the tab
-      browser_tab_id = Math.random().toString(36).substr(2, 9);
-
-      // Store the tab ID in sessionStorage
-      window.sessionStorage.setItem('browser_tab_id', browser_tab_id);
-    }
-
-    console.log('Tab ID:', browser_tab_id);
-    //20230921 [start] browser tab id 
-        
 	var currentMessage = "";
 	let previousMessage = "";
 	let role_system_content = ""; // 20230608
