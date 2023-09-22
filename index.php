@@ -51,6 +51,7 @@ Date        Mod By      Log
 20230815    WeiJun      Addon Model GPT4 32k
 20230921    WeiJun      Addon Chat History Function
 20230922    WeiJun      Enhance Chat History Function by window.name
+20230922    WeiJun      Addon speechSynthesis
 
 -->
 
@@ -296,6 +297,55 @@ Date        Mod By      Log
       }
     }
     // Enhancing User Preferences through Select Option and Local Storage in JavaScript [end  ]
+    
+    // 20230922 [start] speechSynthesis(text to speech)
+    let speech_synth = null; // SpeechSynthesisUtterance instance
+
+    function convert_text_to_speech(text, voice_name, rate) {
+      if ('speechSynthesis' in window) {
+        speech_synth = new SpeechSynthesisUtterance();
+        speech_synth.text = text;
+
+        var voices = speechSynthesis.getVoices();
+        var selected_voice = voices.find((voice) => voice.name === voice_name);
+
+        if (selected_voice) {
+          speech_synth.voice = selected_voice;
+        }
+
+        speech_synth.rate = rate;
+
+        speechSynthesis.speak(speech_synth);
+      } else {
+        alert('Sorry, your browser does not support speech synthesis.');
+      }
+    }
+
+    function stop_speaking() {
+      if (speech_synth && speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+      }
+    }
+
+
+    function highlight_and_read() {
+      let selectedText = '';
+
+      if (window.getSelection) {
+        selectedText = window.getSelection().toString();
+      } else if (document.selection && document.selection.type != "Control") {
+        selectedText = document.selection.createRange().text;
+      }
+
+      if (selectedText !== '') {
+        console.log('Highlighted Text: ' + selectedText);
+        stop_speaking();
+        convert_text_to_speech(selectedText, "Google UK English Male", "0.9");
+      } else {
+        console.log('No text is highlighted.');
+      }
+    }
+    // 20230922 [end  ] speechSynthesis(text to speech)
     </script>
   </head>
   <body>
@@ -310,6 +360,14 @@ Date        Mod By      Log
             <td style="width: 100%; padding: 0px 8px;">
                 <!-- 20230608 [start] addon select option [temperature] -->
                 <table style="width:100%;" cellpadding="0" cellspacing="0" border="0" class="tb_style">
+                    <tr>
+                        <td style="width:auto;height: 100%;">
+                            <input type="button" value="Highlight and Read" onclick="highlight_and_read();">
+                        </td>
+                        <td style="width:1px;height: 100%;text-align: right;">
+                        </td>
+                    </tr>
+                    <tr style="height:5px;"></tr>
                     <tr>
                         <td style="width:auto;height: 100%;">
                             <input type="button" value="Delete Chat History" onclick="delete_chat_history();">
@@ -426,6 +484,7 @@ Date        Mod By      Log
     
     
     <script>
+	var class_replied_message = document.getElementsByClassName("replied-message");
 	var currentMessage = "";
 	let previousMessage = "";
 	let role_system_content = ""; // 20230608
@@ -596,9 +655,6 @@ Date        Mod By      Log
 						"role": "user",
 						"content": currentMessage
 					});
-                    
-                    var chatHistory_json_stringify = JSON.stringify(chatHistory);
-                    write_item("localstorage_chatHistory_"+browser_tab_id,chatHistory_json_stringify);
                         
                     for (let history_message of chatHistory) {
                       console.log(history_message);
@@ -698,6 +754,22 @@ Date        Mod By      Log
                                 
                                 var chatWindow_innerHTML = chatWindow.innerHTML;
                                 write_item("chat_window_html_"+browser_tab_id, chatWindow_innerHTML);
+                    
+                                var chatHistory_json_stringify = JSON.stringify(chatHistory);
+                                write_item("localstorage_chatHistory_"+browser_tab_id,chatHistory_json_stringify);
+                                
+                                class_replied_message = document.getElementsByClassName("replied-message");
+                                for (var i = 0; i < class_replied_message.length; i++) {
+                                    class_replied_message[i].onclick = function(e) {
+                                        var range = document.createRange();
+                                        range.selectNodeContents(e.target);
+                                        var selection = window.getSelection();
+                                        selection.removeAllRanges();
+                                        selection.addRange(range);
+                                        console.log("Selected text: " + selection.toString());
+                                        console.log("Clicked on replied message");
+                                    };
+                                }
 							}
 						});
 					}
@@ -752,7 +824,7 @@ Date        Mod By      Log
                 }
             }
         }
-        // 20230921 [start] addon chatHistory to localstorage
+        // 20230921 [end  ] addon chatHistory to localstorage
 
 		// Add event listener to detect focus
 		inputBox.addEventListener("focus", function(event) {
@@ -871,7 +943,6 @@ Date        Mod By      Log
 
 		
 	});
-        
     </script>
   </body>
 </html>
