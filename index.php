@@ -485,6 +485,8 @@ Date        Mod By      Log
     
     <script>
 	var class_replied_message = document.getElementsByClassName("replied-message");
+	var click_count_class_replied_message = 0;
+	var click_timeout_class_replied_message;
 	var currentMessage = "";
 	let previousMessage = "";
 	let role_system_content = ""; // 20230608
@@ -761,13 +763,28 @@ Date        Mod By      Log
                                 class_replied_message = document.getElementsByClassName("replied-message");
                                 for (var i = 0; i < class_replied_message.length; i++) {
                                     class_replied_message[i].onclick = function(e) {
-                                        var range = document.createRange();
-                                        range.selectNodeContents(e.target);
-                                        var selection = window.getSelection();
-                                        selection.removeAllRanges();
-                                        selection.addRange(range);
-                                        console.log("Selected text: " + selection.toString());
-                                        console.log("Clicked on replied message");
+                                        click_count_class_replied_message++;
+
+                                        // Clear the previous click timeout
+                                        clearTimeout(click_timeout_class_replied_message);
+
+                                        // Start a new click timeout
+                                        click_timeout_class_replied_message = setTimeout(function() {
+                                            // If the click count is three, it's a triple click
+                                            if (click_count_class_replied_message === 3) {
+                                                console.log("Triple click detected!");
+                                                var range = document.createRange();
+                                                range.selectNodeContents(e.target);
+                                                var selection = window.getSelection();
+                                                selection.removeAllRanges();
+                                                selection.addRange(range);
+                                                console.log("Selected text: " + selection.toString());
+                                                console.log("Clicked on replied message");
+                                            }
+
+                                            // Reset the click count
+                                            click_count_class_replied_message = 0;
+                                        }, 300); // Adjust the timeout value as needed
                                     };
                                 }
 							}
